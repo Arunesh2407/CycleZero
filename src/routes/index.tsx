@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
+import { AnalyticsCharts } from "@/components/subscriptions/AnalyticsCharts";
 import { MetricsBar } from "@/components/subscriptions/MetricsBar";
 import {
   SubscriptionForm,
@@ -108,6 +109,7 @@ function Dashboard() {
 
       <main className="mx-auto max-w-7xl space-y-6 px-6 py-8">
         <MetricsBar metrics={data.metrics} />
+        <AnalyticsCharts metrics={data.metrics} />
         <SubscriptionForm
           isPending={addMutation.isPending}
           onSubmit={(input) => addMutation.mutateAsync(input)}

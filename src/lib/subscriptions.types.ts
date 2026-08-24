@@ -15,12 +15,26 @@ export interface SubscriptionDTO {
   isRenewingSoon: boolean;
 }
 
+export interface CategorySpend {
+  category: string;
+  monthlySpend: number;
+  count: number;
+  percentage: number;
+}
+
+export interface MonthlyProjection {
+  month: string;
+  spend: number;
+}
+
 export interface DashboardPayload {
   subscriptions: SubscriptionDTO[];
   metrics: {
     totalMonthlyBurnRate: number;
     upcomingRenewalsCount: number;
     simulatedMonthlySavings: number;
+    categorySpend: CategorySpend[];
+    twelveMonthProjection: MonthlyProjection[];
   };
   serverDate: string;
 }

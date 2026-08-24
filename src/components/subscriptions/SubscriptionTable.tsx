@@ -1,6 +1,15 @@
-import { AlertTriangle, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { AlertTriangle, Calendar, Search, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import {
   Table,
@@ -10,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { downloadICalendar } from "@/lib/ical-generator";
 import type { SubscriptionDTO, SubscriptionStatus } from "@/lib/subscriptions.types";
 
 const currency = (value: number) =>
@@ -46,13 +56,74 @@ export function SubscriptionTable({
   onDelete: (id: string) => void;
   isPending: boolean;
 }) {
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("ALL");
+
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    subscriptions.forEach((s) => set.add(s.category));
+    return Array.from(set).sort();
+  }, [subscriptions]);
+
+  const filteredSubscriptions = useMemo(() => {
+    return subscriptions.filter((sub) => {
+      const matchesSearch =
+        sub.serviceName.toLowerCase().includes(search.toLowerCase()) ||
+        sub.category.toLowerCase().includes(search.toLowerCase());
+
+      const matchesCategory =
+        selectedCategory === "ALL" || sub.category === selectedCategory;
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [subscriptions, search, selectedCategory]);
+
   return (
     <div className="surface-panel overflow-hidden">
-      <div className="flex items-center justify-between border-b border-border px-5 py-4">
-        <h2 className="text-base font-semibold">Subscriptions</h2>
-        <span className="text-xs text-muted-foreground">
-          {subscriptions.length} tracked
-        </span>
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-5 py-4">
+        <div className="flex items-center gap-3">
+          <h2 className="text-base font-semibold">Subscriptions</h2>
+          <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-foreground">
+            {filteredSubscriptions.length} of {subscriptions.length}
+          </span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative w-48 sm:w-64">
+            <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
+            <Input
+              placeholder="Search subscription..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-8 text-xs"
+            />
+          </div>
+
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className="w-40 text-xs">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Categories</SelectItem>
+              {categories.map((cat) => (
+                <SelectItem key={cat} value={cat}>
+                  {cat}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => downloadICalendar(subscriptions)}
+            className="text-xs"
+            title="Download .ics file for Google Calendar, Apple Calendar & Outlook"
+          >
+            <Calendar className="size-3.5" />
+            Export iCal (.ics)
+          </Button>
+        </div>
       </div>
 
       <div className="overflow-x-auto">
@@ -70,15 +141,17 @@ export function SubscriptionTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {subscriptions.length === 0 && (
+            {filteredSubscriptions.length === 0 && (
               <TableRow>
                 <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
-                  No subscriptions yet — add one above.
+                  {subscriptions.length === 0
+                    ? "No subscriptions yet — add one above."
+                    : "No subscriptions match your search or filter."}
                 </TableCell>
               </TableRow>
             )}
 
-            {subscriptions.map((sub) => {
+            {filteredSubscriptions.map((sub) => {
               const paused = sub.status === "PAUSED";
               return (
                 <TableRow
