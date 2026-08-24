@@ -153,6 +153,18 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
   }
+
+  /* Remove ugly browser native number input spin buttons */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
 }
 
 @utility surface-panel {
