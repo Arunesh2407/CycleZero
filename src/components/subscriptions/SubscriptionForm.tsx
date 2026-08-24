@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarIcon, Check, Plus } from "lucide-react";
+import { CalendarIcon, Check, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -139,16 +139,45 @@ export function SubscriptionForm({
           <Label htmlFor="cost" className="text-sm font-semibold">
             Cost ($)
           </Label>
-          <Input
-            id="cost"
-            type="number"
-            min="0"
-            step="0.01"
-            value={form.cost}
-            placeholder="9.99"
-            onChange={(e) => setForm({ ...form, cost: e.target.value })}
-            required
-          />
+          <div className="relative flex items-center">
+            <Input
+              id="cost"
+              type="number"
+              min="0"
+              step="0.01"
+              value={form.cost}
+              placeholder="9.99"
+              onChange={(e) => setForm({ ...form, cost: e.target.value })}
+              className="pr-7 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              required
+            />
+            <div className="absolute right-1 flex flex-col gap-0.5 pr-0.5">
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => {
+                  const val = Number(form.cost || 0);
+                  setForm({ ...form, cost: (val + 1).toFixed(2).replace(/\.00$/, "") });
+                }}
+                className="text-muted-foreground hover:text-foreground transition-colors p-0.5 rounded hover:bg-secondary/80 focus:outline-none"
+                aria-label="Increase cost"
+              >
+                <ChevronUp className="size-3" />
+              </button>
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => {
+                  const val = Math.max(0, Number(form.cost || 0) - 1);
+                  setForm({ ...form, cost: (val > 0 ? val.toFixed(2).replace(/\.00$/, "") : "0") });
+                }}
+                className="text-muted-foreground hover:text-foreground transition-colors p-0.5 rounded hover:bg-secondary/80 focus:outline-none"
+                aria-label="Decrease cost"
+              >
+                <ChevronDown className="size-3" />
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="space-y-2">
