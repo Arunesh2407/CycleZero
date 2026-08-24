@@ -37,15 +37,15 @@ export function MetricsBar({ metrics }: { metrics: DashboardPayload["metrics"] }
       {cards.map((card) => (
         <div key={card.label} className="surface-panel p-5">
           <div className="flex items-start justify-between gap-3">
-            <p className="text-sm font-medium text-muted-foreground">{card.label}</p>
+            <p className="text-sm font-semibold text-muted-foreground">{card.label}</p>
             <span className={`rounded-lg p-2 ${card.ring}`}>
               <card.icon className="size-4" />
             </span>
           </div>
-          <p className={`mt-3 text-3xl font-semibold tracking-tight ${card.tone}`}>
+          <p className={`mt-3 text-3xl font-bold tracking-tight ${card.tone}`}>
             {card.value}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">{card.hint}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{card.hint}</p>
         </div>
       ))}
     </div>
